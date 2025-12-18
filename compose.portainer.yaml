@@ -166,7 +166,7 @@ services:
       - traefik.http.middlewares.erpnext.headers.customrequestheaders.Host=erp.gmi.giize.com
       - traefik.http.routers.erpnext.middlewares=erpnext
     networks:
-      - traefik-public
+      - web
       - bench-network
 
   cron:
