@@ -24,7 +24,7 @@ services:
       - bench-network
 
 networks:
-  traefik-public:
+  web:
     external: true
   bench-network:
     name: ${BENCH_NETWORK?BENCH_NETWORK not set}
