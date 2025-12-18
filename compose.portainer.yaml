@@ -51,6 +51,8 @@ services:
     depends_on:
       - backend
       - db
+    networks:
+      - bench-network
     entrypoint:
       - bash
       - -c
