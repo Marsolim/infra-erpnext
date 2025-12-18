@@ -34,6 +34,43 @@ services:
       - bench-network
     restart: on-failure
 
+  create-site:
+    image: frappe/erpnext:v16
+    pull_policy: ${PULL_POLICY:-always}
+    platform: linux/amd64
+    container_name: create-site
+    volumes:
+      - erpnext-sites:/home/frappe/frappe-bench/sites
+    environment:
+      DB_HOST: db
+      DB_PORT: 3306
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-GMI464it}
+      # Set your desired Admin password here
+      ADMIN_PASSWORD: "admin"
+      SITE_NAME: "erp.gmi.giize.com"
+    depends_on:
+      - backend
+      - db
+    entrypoint:
+      - bash
+      - -c
+    command:
+      - >
+        wait-for-it -t 120 db:3306;
+        wait-for-it -t 120 backend:8000;
+        if [ ! -d "sites/$$SITE_NAME" ]; then
+          echo "Creating site $$SITE_NAME...";
+          bench new-site $$SITE_NAME \
+            --no-mariadb-socket \
+            --mariadb-root-password $$MYSQL_ROOT_PASSWORD \
+            --admin-password $$ADMIN_PASSWORD \
+            --install-app erpnext \
+            --set-default;
+          echo "Site created successfully";
+        else
+          echo "Site $$SITE_NAME already exists.";
+        fi
+
   db:
     image: mariadb:lts-ubi9
     platform: linux/amd64
