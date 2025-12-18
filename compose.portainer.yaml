@@ -8,6 +8,7 @@ services:
     volumes:
       - sites:/home/frappe/frappe-bench/sites
     platform: linux/amd64
+    container_name: configurator
     entrypoint:
       - bash
       - -c
@@ -39,6 +40,7 @@ services:
 
   db:
     image: postgres:15
+    container_name: db
     #command: []
     environment:
       POSTGRES_PASSWORD: ${DB_PASSWORD:-GMI464it}
@@ -49,6 +51,7 @@ services:
     image: frappe/erpnext:v16
     pull_policy: ${PULL_POLICY:-always}
     restart: ${RESTART_POLICY:-unless-stopped}
+    container_name: backend
     depends_on:
       - configurator
     #<<: [*depends_on_configurator, *customizable_image]
@@ -61,6 +64,7 @@ services:
     pull_policy: ${PULL_POLICY:-always}
     restart: ${RESTART_POLICY:-unless-stopped}
     platform: linux/amd64
+    container_name: frontend
     command:
       - nginx-entrypoint.sh
     environment:
@@ -85,6 +89,7 @@ services:
     image: frappe/erpnext:v16
     pull_policy: ${PULL_POLICY:-always}
     restart: ${RESTART_POLICY:-unless-stopped}
+    container_name: websocket
     depends_on:
       - configurator
     #<<: [*depends_on_configurator, *customizable_image]
@@ -99,6 +104,7 @@ services:
     image: frappe/erpnext:v16
     pull_policy: ${PULL_POLICY:-always}
     restart: ${RESTART_POLICY:-unless-stopped}
+    container_name: queue-short
     depends_on:
       - configurator
     #<<: [*depends_on_configurator, *customizable_image]
@@ -111,6 +117,7 @@ services:
     image: frappe/erpnext:v16
     pull_policy: ${PULL_POLICY:-always}
     restart: ${RESTART_POLICY:-unless-stopped}
+    container_name: queue-long
     depends_on:
       - configurator
     #<<: [*depends_on_configurator, *customizable_image]
@@ -123,6 +130,7 @@ services:
     image: frappe/erpnext:v16
     pull_policy: ${PULL_POLICY:-always}
     restart: ${RESTART_POLICY:-unless-stopped}
+    container_name: scheduler
     depends_on:
       - configurator
     #<<: [*depends_on_configurator, *customizable_image]
@@ -138,16 +146,19 @@ services:
 
   redis-cache:
     image: redis:6.2-alpine
+    container_name: redis-cache
     restart: unless-stopped
 
   redis-queue:
     image: redis:6.2-alpine
+    container_name: redis-queue
     restart: unless-stopped
     volumes:
       - redis-queue-data:/data
 
   custom-domain:
     image: caddy:2
+    container_name: custom-domain
     command:
       - caddy
       - reverse-proxy
@@ -171,6 +182,7 @@ services:
 
   cron:
     image: mcuadros/ofelia:latest
+    container_name: cron
     depends_on:
       - scheduler
     command: daemon --docker
