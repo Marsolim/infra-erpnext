@@ -31,7 +31,7 @@ services:
       REDIS_CACHE: redis-cache:6379
       REDIS_QUEUE: redis-queue:6379
       DB_HOST: db
-      DB_PORT: 5432
+      DB_PORT: 3306
     depends_on:
       - redis-cache
       - redis-queue
@@ -47,6 +47,7 @@ services:
       timeout: 5s
       retries: 5
     restart: unless-stopped
+    container_name: db
     command:
       - --character-set-server=utf8mb4
       - --collation-server=utf8mb4_unicode_ci
