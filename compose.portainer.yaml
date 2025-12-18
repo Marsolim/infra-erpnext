@@ -4,7 +4,6 @@ services:
   configurator:
     image: frappe/erpnext:v16
     pull_policy: ${PULL_POLICY:-always}
-    #<<: [*depends_on_configurator, *customizable_image]
     volumes:
       - erpnext-sites:/home/frappe/frappe-bench/sites
     platform: linux/amd64
@@ -12,7 +11,6 @@ services:
     entrypoint:
       - bash
       - -c
-    # add redis_socketio for backward compatibility
     command:
       - >
         ls -1 apps > sites/apps.txt;
@@ -23,10 +21,6 @@ services:
         bench set-config -g redis_socketio "redis://$$REDIS_QUEUE";
         bench set-config -gp socketio_port $$SOCKETIO_PORT;
     environment:
-      #DB_HOST: ${DB_HOST:-}
-      #DB_PORT: ${DB_PORT:-}
-      #REDIS_CACHE: ${REDIS_CACHE:-}
-      #REDIS_QUEUE: ${REDIS_QUEUE:-}
       SOCKETIO_PORT: 9000
       REDIS_CACHE: redis-cache:6379
       REDIS_QUEUE: redis-queue:6379
@@ -36,6 +30,8 @@ services:
       - redis-cache
       - redis-queue
       - db
+    networks:
+      - bench-network
     restart: on-failure
 
   db:
@@ -53,12 +49,14 @@ services:
       - --character-set-server=utf8mb4
       - --collation-server=utf8mb4_unicode_ci
       - --skip-character-set-client-handshake
-      - --skip-innodb-read-only-compressed # Temporary fix for MariaDB 10.6
+      - --skip-innodb-read-only-compressed # Temporary fix for MariaDB 10.6+
     environment:
       MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-GMI464it}
       MARIADB_AUTO_UPGRADE: 1
     volumes:
       - erpnext-db-data:/var/lib/mysql
+    networks:
+      - bench-network
 
   backend:
     image: frappe/erpnext:v16
@@ -69,7 +67,6 @@ services:
       - configurator
     networks:
       - bench-network
-    #<<: [*depends_on_configurator, *customizable_image]
     volumes:
       - erpnext-sites:/home/frappe/frappe-bench/sites
     platform: linux/amd64
@@ -80,8 +77,10 @@ services:
     restart: ${RESTART_POLICY:-unless-stopped}
     platform: linux/amd64
     container_name: frontend
-    ports:
-      - "8080:8080"
+    # Ports commented out for security. 
+    # Since you use Traefik/Caddy, you shouldn't expose 8080 directly to the world.
+    # ports:
+    #   - "8080:8080"
     command:
       - nginx-entrypoint.sh
     environment:
@@ -102,16 +101,12 @@ services:
       - bench-network
 
   websocket:
-    # By default the image used only contains the `frappe` and `erpnext` apps.
-    # See https://github.com/frappe/frappe_docker/blob/main/docs/container-setup/02-build-setup.md#define-custom-apps
-    # about using custom images.
     image: frappe/erpnext:v16
     pull_policy: ${PULL_POLICY:-always}
     restart: ${RESTART_POLICY:-unless-stopped}
     container_name: websocket
     depends_on:
       - configurator
-    #<<: [*depends_on_configurator, *customizable_image]
     platform: linux/amd64
     command:
       - node
@@ -128,7 +123,6 @@ services:
     container_name: queue-short
     depends_on:
       - configurator
-    #<<: [*depends_on_configurator, *customizable_image]
     volumes:
       - erpnext-sites:/home/frappe/frappe-bench/sites
     platform: linux/amd64
@@ -143,7 +137,6 @@ services:
     container_name: queue-long
     depends_on:
       - configurator
-    #<<: [*depends_on_configurator, *customizable_image]
     volumes:
       - erpnext-sites:/home/frappe/frappe-bench/sites
     platform: linux/amd64
@@ -158,11 +151,12 @@ services:
     container_name: scheduler
     depends_on:
       - configurator
-    #<<: [*depends_on_configurator, *customizable_image]
     volumes:
       - erpnext-sites:/home/frappe/frappe-bench/sites
     platform: linux/amd64
     command: bench schedule
+    networks:
+      - bench-network
     labels:
       ofelia.enabled: "true"
       ofelia.job-exec.datecron.schedule: "${BACKUP_CRONSTRING:-@every 6h}"
@@ -185,6 +179,8 @@ services:
     networks:
       - bench-network
 
+  # Note: You have a Caddy instance sitting between Traefik and ERPNext.
+  # This adds a layer of complexity. Ensure this is intentional.
   custom-domain:
     image: caddy:2
     container_name: custom-domain
@@ -197,12 +193,12 @@ services:
       - :2016
     labels:
       - traefik.enable=true
-      - traefik.docker.network=traefik-public
+      - traefik.docker.network=web # Important: Must match the Traefik external network
       - traefik.http.services.erpnext.loadbalancer.server.port=2016
       - traefik.http.routers.erpnext.service=erpnext
       - traefik.http.routers.erpnext.entrypoints=web,websecure
       - traefik.http.routers.erpnext.tls=true
-      #- traefik.http.routers.erpnext.tls.passthrough=true
+      # - traefik.http.routers.erpnext.tls.passthrough=true
       - traefik.http.routers.erpnext.rule=Host(`erp.gmi.giize.com`)
       - traefik.http.middlewares.erpnext.headers.customrequestheaders.Host=erp.gmi.giize.com
       - traefik.http.routers.erpnext.middlewares=erpnext
@@ -218,6 +214,8 @@ services:
     command: daemon --docker
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
+    networks:
+      - bench-network
 
 networks:
   web:
