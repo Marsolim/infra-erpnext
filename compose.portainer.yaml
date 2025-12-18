@@ -4,7 +4,6 @@ services:
   configurator:
     image: ${CUSTOM_IMAGE:-frappe/erpnext}:${CUSTOM_TAG:-$ERPNEXT_VERSION}
     pull_policy: ${PULL_POLICY:-always}
-    restart: ${RESTART_POLICY:-unless-stopped}
     #<<: [*depends_on_configurator, *customizable_image]
     volumes:
       - sites:/home/frappe/frappe-bench/sites
