@@ -103,6 +103,8 @@ services:
       - /home/frappe/frappe-bench/apps/frappe/socketio.js
     volumes:
       - sites:/home/frappe/frappe-bench/sites
+    networks:
+      - bench-network
 
   queue-short:
     image: frappe/erpnext:v16
@@ -116,6 +118,8 @@ services:
       - sites:/home/frappe/frappe-bench/sites
     platform: linux/amd64
     command: bench worker --queue short,default
+    networks:
+      - bench-network
 
   queue-long:
     image: frappe/erpnext:v16
@@ -129,6 +133,8 @@ services:
       - sites:/home/frappe/frappe-bench/sites
     platform: linux/amd64
     command: bench worker --queue long,default,short
+    networks:
+      - bench-network
 
   scheduler:
     image: frappe/erpnext:v16
@@ -152,6 +158,8 @@ services:
     image: redis:6.2-alpine
     container_name: redis-cache
     restart: unless-stopped
+    networks:
+      - bench-network
 
   redis-queue:
     image: redis:6.2-alpine
@@ -159,6 +167,8 @@ services:
     restart: unless-stopped
     volumes:
       - redis-queue-data:/data
+    networks:
+      - bench-network
 
   custom-domain:
     image: caddy:2
