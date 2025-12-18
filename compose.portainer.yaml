@@ -1,35 +1,16 @@
 version: "3.9"
 
-x-customizable-image: &customizable_image
-  # By default the image used only contains the `frappe` and `erpnext` apps.
-  # See https://github.com/frappe/frappe_docker/blob/main/docs/container-setup/02-build-setup.md#define-custom-apps
-  # about using custom images.
-  image: ${CUSTOM_IMAGE:-frappe/erpnext}:${CUSTOM_TAG:-$ERPNEXT_VERSION}
-  pull_policy: ${PULL_POLICY:-always}
-  restart: ${RESTART_POLICY:-unless-stopped}
-
-#x-depends-on-configurator: &depends_on_configurator
-#  depends_on:
-#    configurator:
-#      condition: service_completed_successfully
-
-x-backend-defaults: &backend_defaults
-  # By default the image used only contains the `frappe` and `erpnext` apps.
-  # See https://github.com/frappe/frappe_docker/blob/main/docs/container-setup/02-build-setup.md#define-custom-apps
-  # about using custom images.
-  image: ${CUSTOM_IMAGE:-frappe/erpnext}:${CUSTOM_TAG:-$ERPNEXT_VERSION}
-  pull_policy: ${PULL_POLICY:-always}
-  restart: ${RESTART_POLICY:-unless-stopped}
-  depends_on:
-    configurator:
-      condition: service_completed_successfully
-  #<<: [*depends_on_configurator, *customizable_image]
-  volumes:
-    - sites:/home/frappe/frappe-bench/sites
-
 services:
   configurator:
-    <<: *backend_defaults
+    image: ${CUSTOM_IMAGE:-frappe/erpnext}:${CUSTOM_TAG:-$ERPNEXT_VERSION}
+    pull_policy: ${PULL_POLICY:-always}
+    restart: ${RESTART_POLICY:-unless-stopped}
+    depends_on:
+      configurator:
+        condition: service_completed_successfully
+    #<<: [*depends_on_configurator, *customizable_image]
+    volumes:
+      - sites:/home/frappe/frappe-bench/sites
     platform: linux/amd64
     entrypoint:
       - bash
@@ -54,11 +35,21 @@ services:
     restart: on-failure
 
   backend:
-    <<: *backend_defaults
+    image: ${CUSTOM_IMAGE:-frappe/erpnext}:${CUSTOM_TAG:-$ERPNEXT_VERSION}
+    pull_policy: ${PULL_POLICY:-always}
+    restart: ${RESTART_POLICY:-unless-stopped}
+    depends_on:
+      configurator:
+        condition: service_completed_successfully
+    #<<: [*depends_on_configurator, *customizable_image]
+    volumes:
+      - sites:/home/frappe/frappe-bench/sites
     platform: linux/amd64
 
   frontend:
-    <<: *customizable_image
+    image: ${CUSTOM_IMAGE:-frappe/erpnext}:${CUSTOM_TAG:-$ERPNEXT_VERSION}
+    pull_policy: ${PULL_POLICY:-always}
+    restart: ${RESTART_POLICY:-unless-stopped}
     platform: linux/amd64
     command:
       - nginx-entrypoint.sh
@@ -97,17 +88,41 @@ services:
       - sites:/home/frappe/frappe-bench/sites
 
   queue-short:
-    <<: *backend_defaults
+    image: ${CUSTOM_IMAGE:-frappe/erpnext}:${CUSTOM_TAG:-$ERPNEXT_VERSION}
+    pull_policy: ${PULL_POLICY:-always}
+    restart: ${RESTART_POLICY:-unless-stopped}
+    depends_on:
+      configurator:
+        condition: service_completed_successfully
+    #<<: [*depends_on_configurator, *customizable_image]
+    volumes:
+      - sites:/home/frappe/frappe-bench/sites
     platform: linux/amd64
     command: bench worker --queue short,default
 
   queue-long:
-    <<: *backend_defaults
+    image: ${CUSTOM_IMAGE:-frappe/erpnext}:${CUSTOM_TAG:-$ERPNEXT_VERSION}
+    pull_policy: ${PULL_POLICY:-always}
+    restart: ${RESTART_POLICY:-unless-stopped}
+    depends_on:
+      configurator:
+        condition: service_completed_successfully
+    #<<: [*depends_on_configurator, *customizable_image]
+    volumes:
+      - sites:/home/frappe/frappe-bench/sites
     platform: linux/amd64
     command: bench worker --queue long,default,short
 
   scheduler:
-    <<: *backend_defaults
+    image: ${CUSTOM_IMAGE:-frappe/erpnext}:${CUSTOM_TAG:-$ERPNEXT_VERSION}
+    pull_policy: ${PULL_POLICY:-always}
+    restart: ${RESTART_POLICY:-unless-stopped}
+    depends_on:
+      configurator:
+        condition: service_completed_successfully
+    #<<: [*depends_on_configurator, *customizable_image]
+    volumes:
+      - sites:/home/frappe/frappe-bench/sites
     platform: linux/amd64
     command: bench schedule
 
