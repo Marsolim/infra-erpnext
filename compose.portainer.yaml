@@ -54,6 +54,8 @@ services:
     container_name: backend
     depends_on:
       - configurator
+    networks:
+      - bench-network
     #<<: [*depends_on_configurator, *customizable_image]
     volumes:
       - sites:/home/frappe/frappe-bench/sites
@@ -81,6 +83,8 @@ services:
     depends_on:
       - backend
       - websocket
+    networks:
+      - bench-network
 
   websocket:
     # By default the image used only contains the `frappe` and `erpnext` apps.
