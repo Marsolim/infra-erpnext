@@ -80,6 +80,8 @@ services:
     restart: ${RESTART_POLICY:-unless-stopped}
     platform: linux/amd64
     container_name: frontend
+    ports:
+      - "8080:80"
     command:
       - nginx-entrypoint.sh
     environment:
