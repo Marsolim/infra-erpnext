@@ -30,10 +30,21 @@ services:
     environment:
       REDIS_CACHE: redis-cache:6379
       REDIS_QUEUE: redis-queue:6379
+      DB_HOST: db
+      DB_PORT: 5432
     depends_on:
       - redis-cache
       - redis-queue
+      - db
     restart: on-failure
+
+  db:
+    image: postgres:15
+    command: []
+    environment:
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?No db password set}
+    volumes:
+      - db-data:/var/lib/postgresql/data
 
   backend:
     image: ${CUSTOM_IMAGE:-frappe/erpnext}:${CUSTOM_TAG:-$ERPNEXT_VERSION}
@@ -140,3 +151,4 @@ services:
 volumes:
   sites:
   redis-queue-data:
+  db-data:
