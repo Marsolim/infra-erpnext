@@ -173,6 +173,7 @@ services:
       - traefik.http.routers.erpnext.service=erpnext
       - traefik.http.routers.erpnext.entrypoints=web,websecure
       - traefik.http.routers.erpnext.tls=true
+      - traefik.http.routers.erpnext.tls.passthrough=true
       - traefik.http.routers.erpnext.rule=Host(`erp.gmi.giize.com`)
       - traefik.http.middlewares.erpnext.headers.customrequestheaders.Host=erp.gmi.giize.com
       - traefik.http.routers.erpnext.middlewares=erpnext
