@@ -81,7 +81,7 @@ services:
     platform: linux/amd64
     container_name: frontend
     ports:
-      - "8080:80"
+      - "8080:8080"
     command:
       - nginx-entrypoint.sh
     environment:
@@ -109,8 +109,6 @@ services:
     pull_policy: ${PULL_POLICY:-always}
     restart: ${RESTART_POLICY:-unless-stopped}
     container_name: websocket
-    ports:
-      - "9000:9000"
     depends_on:
       - configurator
     #<<: [*depends_on_configurator, *customizable_image]
