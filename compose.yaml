@@ -67,8 +67,7 @@ services:
       - websocket
 
   websocket:
-    <<: *depends_on_configurator
-    <<: *customizable_image
+    <<: [*depends_on_configurator, *customizable_image]
     platform: linux/amd64
     command:
       - node
