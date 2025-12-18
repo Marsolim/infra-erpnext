@@ -86,9 +86,7 @@ services:
     pull_policy: ${PULL_POLICY:-always}
     restart: ${RESTART_POLICY:-unless-stopped}
     depends_on:
-      configurator:
-        condition: service_completed_successfully
-
+      - configurator
     #<<: [*depends_on_configurator, *customizable_image]
     platform: linux/amd64
     command:
@@ -102,8 +100,7 @@ services:
     pull_policy: ${PULL_POLICY:-always}
     restart: ${RESTART_POLICY:-unless-stopped}
     depends_on:
-      configurator:
-        condition: service_completed_successfully
+      - configurator
     #<<: [*depends_on_configurator, *customizable_image]
     volumes:
       - sites:/home/frappe/frappe-bench/sites
@@ -115,8 +112,7 @@ services:
     pull_policy: ${PULL_POLICY:-always}
     restart: ${RESTART_POLICY:-unless-stopped}
     depends_on:
-      configurator:
-        condition: service_completed_successfully
+      - configurator
     #<<: [*depends_on_configurator, *customizable_image]
     volumes:
       - sites:/home/frappe/frappe-bench/sites
@@ -128,8 +124,7 @@ services:
     pull_policy: ${PULL_POLICY:-always}
     restart: ${RESTART_POLICY:-unless-stopped}
     depends_on:
-      configurator:
-        condition: service_completed_successfully
+      - configurator
     #<<: [*depends_on_configurator, *customizable_image]
     volumes:
       - sites:/home/frappe/frappe-bench/sites
