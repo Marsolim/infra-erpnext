@@ -2,4 +2,6 @@ services:
   custom-domain:
     labels:
       - traefik.http.routers.${ROUTER}.entrypoints=http,https
-      - traefik.http.routers.${ROUTER}.tls.certresolver=le
+      - traefik.http.routers.${ROUTER}.tls=true
+      ## Uncomment if using letsencrypt ssl certificate
+      #- traefik.http.routers.${ROUTER}.tls.certresolver=le
