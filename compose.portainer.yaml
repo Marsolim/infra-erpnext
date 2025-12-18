@@ -58,8 +58,8 @@ services:
       - -c
     command:
       - >
-        wait-for-it -t 120 db:3306;
-        wait-for-it -t 120 backend:8000;
+        wait-for-it -t 30 db:3306;
+        wait-for-it -t 30 backend:8000;
         if [ ! -d "sites/$$SITE_NAME" ]; then
           echo "Creating site $$SITE_NAME...";
           bench new-site $$SITE_NAME \
