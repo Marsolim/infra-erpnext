@@ -162,8 +162,8 @@ services:
       - traefik.http.routers.${ROUTER:-erpnext}.service=${ROUTER:-erpnext}
       - traefik.http.routers.${ROUTER:-erpnext}.entrypoints=http,https
       - traefik.http.routers.${ROUTER:-erpnext}.tls=true
-      - traefik.http.routers.${ROUTER:-erpnext}.rule=Host(${SITES:-`erp.gmi.giize.com`})
-      - traefik.http.middlewares.${ROUTER:-erpnext}.headers.customrequestheaders.Host=${BASE_SITE:-`erp.gmi.giize.com`}
+      - traefik.http.routers.${ROUTER:-erpnext}.rule=Host(`erp.gmi.giize.com`)
+      - traefik.http.middlewares.${ROUTER:-erpnext}.headers.customrequestheaders.Host=erp.gmi.giize.com
       - traefik.http.routers.${ROUTER:-erpnext}.middlewares=${ROUTER:-erpnext}
     networks:
       - traefik-public
