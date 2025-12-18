@@ -107,6 +107,8 @@ services:
     pull_policy: ${PULL_POLICY:-always}
     restart: ${RESTART_POLICY:-unless-stopped}
     container_name: websocket
+    ports:
+      - "9000:9000"
     depends_on:
       - configurator
     #<<: [*depends_on_configurator, *customizable_image]
