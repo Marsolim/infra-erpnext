@@ -6,7 +6,7 @@ services:
     pull_policy: ${PULL_POLICY:-always}
     #<<: [*depends_on_configurator, *customizable_image]
     volumes:
-      - sites:/home/frappe/frappe-bench/sites
+      - erpnext-sites:/home/frappe/frappe-bench/sites
     platform: linux/amd64
     container_name: configurator
     entrypoint:
@@ -40,6 +40,7 @@ services:
 
   db:
     image: mariadb:lts-ubi9
+    platform: linux/amd64
     healthcheck:
       test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
       start_period: 5s
@@ -57,7 +58,7 @@ services:
       MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-GMI464it}
       MARIADB_AUTO_UPGRADE: 1
     volumes:
-      - db-data:/var/lib/mysql
+      - erpnext-db-data:/var/lib/mysql
 
   backend:
     image: frappe/erpnext:v16
@@ -70,7 +71,7 @@ services:
       - bench-network
     #<<: [*depends_on_configurator, *customizable_image]
     volumes:
-      - sites:/home/frappe/frappe-bench/sites
+      - erpnext-sites:/home/frappe/frappe-bench/sites
     platform: linux/amd64
 
   frontend:
@@ -91,7 +92,7 @@ services:
       PROXY_READ_TIMEOUT: ${PROXY_READ_TIMEOUT:-120}
       CLIENT_MAX_BODY_SIZE: ${CLIENT_MAX_BODY_SIZE:-50m}
     volumes:
-      - sites:/home/frappe/frappe-bench/sites
+      - erpnext-sites:/home/frappe/frappe-bench/sites
     depends_on:
       - backend
       - websocket
@@ -114,7 +115,7 @@ services:
       - node
       - /home/frappe/frappe-bench/apps/frappe/socketio.js
     volumes:
-      - sites:/home/frappe/frappe-bench/sites
+      - erpnext-sites:/home/frappe/frappe-bench/sites
     networks:
       - bench-network
 
@@ -127,7 +128,7 @@ services:
       - configurator
     #<<: [*depends_on_configurator, *customizable_image]
     volumes:
-      - sites:/home/frappe/frappe-bench/sites
+      - erpnext-sites:/home/frappe/frappe-bench/sites
     platform: linux/amd64
     command: bench worker --queue short,default
     networks:
@@ -142,7 +143,7 @@ services:
       - configurator
     #<<: [*depends_on_configurator, *customizable_image]
     volumes:
-      - sites:/home/frappe/frappe-bench/sites
+      - erpnext-sites:/home/frappe/frappe-bench/sites
     platform: linux/amd64
     command: bench worker --queue long,default,short
     networks:
@@ -157,7 +158,7 @@ services:
       - configurator
     #<<: [*depends_on_configurator, *customizable_image]
     volumes:
-      - sites:/home/frappe/frappe-bench/sites
+      - erpnext-sites:/home/frappe/frappe-bench/sites
     platform: linux/amd64
     command: bench schedule
     labels:
@@ -178,7 +179,7 @@ services:
     container_name: redis-queue
     restart: unless-stopped
     volumes:
-      - redis-queue-data:/data
+      - erpnext-redis-queue-data:/data
     networks:
       - bench-network
 
@@ -224,6 +225,9 @@ networks:
     external: true
 
 volumes:
-  sites:
-  redis-queue-data:
-  db-data:
+  erpnext-sites:
+    external: true
+  erpnext-redis-queue-data:
+    external: true
+  erpnext-db-data:
+    external: true
