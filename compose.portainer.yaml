@@ -136,6 +136,11 @@ services:
       - sites:/home/frappe/frappe-bench/sites
     platform: linux/amd64
     command: bench schedule
+    labels:
+      ofelia.enabled: "true"
+      ofelia.job-exec.datecron.schedule: "${BACKUP_CRONSTRING:-@every 6h}"
+      ofelia.job-exec.datecron.command: "bench --site all backup"
+      ofelia.job-exec.datecron.user: "frappe"
 
   redis-cache:
     image: redis:6.2-alpine
@@ -177,13 +182,6 @@ services:
     command: daemon --docker
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
-
-  scheduler:
-    labels:
-      ofelia.enabled: "true"
-      ofelia.job-exec.datecron.schedule: "${BACKUP_CRONSTRING:-@every 6h}"
-      ofelia.job-exec.datecron.command: "bench --site all backup"
-      ofelia.job-exec.datecron.user: "frappe"
 
 networks:
   web:
