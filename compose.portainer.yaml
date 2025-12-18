@@ -158,13 +158,13 @@ services:
     labels:
       - traefik.enable=true
       - traefik.docker.network=traefik-public
-      - traefik.http.services.${ROUTER:-erpnext}.loadbalancer.server.port=2016
-      - traefik.http.routers.${ROUTER:-erpnext}.service=${ROUTER:-erpnext}
-      - traefik.http.routers.${ROUTER:-erpnext}.entrypoints=http,https
-      - traefik.http.routers.${ROUTER:-erpnext}.tls=true
-      - traefik.http.routers.${ROUTER:-erpnext}.rule=Host(`erp.gmi.giize.com`)
-      - traefik.http.middlewares.${ROUTER:-erpnext}.headers.customrequestheaders.Host=erp.gmi.giize.com
-      - traefik.http.routers.${ROUTER:-erpnext}.middlewares=${ROUTER:-erpnext}
+      - traefik.http.services.erpnext.loadbalancer.server.port=2016
+      - traefik.http.routers.erpnext.service=erpnext
+      - traefik.http.routers.erpnext.entrypoints=http,https
+      - traefik.http.routers.erpnext.tls=true
+      - traefik.http.routers.erpnext.rule=Host(`erp.gmi.giize.com`)
+      - traefik.http.middlewares.erpnext.headers.customrequestheaders.Host=erp.gmi.giize.com
+      - traefik.http.routers.erpnext.middlewares=erpnext
     networks:
       - traefik-public
       - bench-network
